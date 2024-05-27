@@ -147,7 +147,7 @@ class Subscriber
     {
         $channelPostfix = null;
 
-        if (!isset($resolveInfo->fieldDefinition->astNode)) {
+        if (isset($resolveInfo->fieldDefinition->astNode)) {
             $directive = ASTHelper::directiveDefinition(
                 $resolveInfo->fieldDefinition->astNode,
                 SharedDirective::NAME
