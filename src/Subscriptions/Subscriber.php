@@ -8,6 +8,8 @@ use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Subscriptions\Directives\SharedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
@@ -58,8 +60,10 @@ class Subscriber
         public GraphQLContext $context,
         ResolveInfo $resolveInfo,
     ) {
+        $channelPostfix = $this->getChannelPostfix($resolveInfo);
+
         $this->fieldName = $resolveInfo->fieldName;
-        $this->channel = self::uniqueChannelName();
+        $this->channel = self::channelName($channelPostfix);
         $this->variables = $resolveInfo->variableValues;
 
         $xSocketID = request()->header('X-Socket-ID');
@@ -76,6 +80,24 @@ class Subscriber
                 [$resolveInfo->operation],
             )),
         ]);
+    }
+
+    /** Generate a unique private channel name. */
+    public static function uniqueChannelName($base): string
+    {
+        return $base.Str::random(32).'-'.time();
+    }
+
+    /** Generate a private channel name. */
+    public static function channelName($postfix = null): string
+    {
+        $nameBase = 'private-lighthouse-';
+
+        if (empty($postfix)) {
+            return self::uniqueChannelName($nameBase);
+        }
+
+        return $nameBase.$postfix;
     }
 
     /** @return array<string, mixed> */
@@ -104,7 +126,8 @@ class Subscriber
         $documentNode = AST::fromArray(
             unserialize($data['query']),
         );
-        assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
+        assert($documentNode instanceof DocumentNode,
+            'We know the type since it is set during construction and serialized.');
 
         $this->socket_id = $data['socket_id'];
         $this->query = $documentNode;
@@ -116,10 +139,26 @@ class Subscriber
         );
     }
 
-    /** Generate a unique private channel name. */
-    public static function uniqueChannelName(): string
+    /**
+     * @param  ResolveInfo  $resolveInfo
+     * @return mixed|null
+     */
+    public function getChannelPostfix(ResolveInfo $resolveInfo): mixed
     {
-        return 'private-lighthouse-' . Str::random(32) . '-' . time();
+        $channelPostfix = null;
+
+        if (!isset($resolveInfo->fieldDefinition->astNode)) {
+            $directive = ASTHelper::directiveDefinition(
+                $resolveInfo->fieldDefinition->astNode,
+                SharedDirective::NAME
+            );
+            $channelPostfix = $directive === null ? null : ASTHelper::directiveArgValue(
+                $directive,
+                'name'
+            );
+        }
+
+        return $channelPostfix;
     }
 
     protected function contextSerializer(): SerializesContext
