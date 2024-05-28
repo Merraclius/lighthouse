@@ -152,10 +152,22 @@ class Subscriber
                 $resolveInfo->fieldDefinition->astNode,
                 SharedDirective::NAME
             );
-            $channelPostfix = $directive === null ? null : ASTHelper::directiveArgValue(
+            $channelPostfixBase = $directive === null ? null : ASTHelper::directiveArgValue(
                 $directive,
                 'name'
             );
+
+            if ($channelPostfixBase !== null) {
+                if (!empty($resolveInfo->variableValues)) {
+                    $variables = $resolveInfo->variableValues;
+
+                    sort($variables);
+
+                    $channelPostfix = $channelPostfixBase.'-'.md5(json_encode($variables));
+                } else {
+                    $channelPostfix = $channelPostfixBase;
+                }
+            }
         }
 
         return $channelPostfix;
