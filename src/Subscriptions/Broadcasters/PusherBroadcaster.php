@@ -68,4 +68,29 @@ class PusherBroadcaster implements Broadcaster
             $this->exceptionHandler->report($apiErrorException);
         }
     }
+
+    public function broadcastBatch(array $batch): void
+    {
+        try {
+            $preparedBatch = [];
+
+            foreach ($batch as $data) {
+                $subscriber = $data['subscriber'];
+                $result = $data['result'];
+
+                $preparedBatch[] = [
+                    'channel' => $subscriber->channel,
+                    'name' => self::EVENT_NAME,
+                    'data' => [
+                        'more' => true,
+                        'result' => $result,
+                    ],
+                ];
+            }
+
+            $this->pusher->triggerBatch($preparedBatch);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->exceptionHandler->report($apiErrorException);
+        }
+    }
 }
