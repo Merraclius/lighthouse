@@ -65,12 +65,17 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     private function broadcastBatch(GraphQLSubscription $subscription, string $fieldName, Collection $roots): void
     {
         $batch = [];
+        $cachedSubscribers = [];
 
-        $roots->each(function($root) use ($subscription, $fieldName, &$batch) {
+        $roots->each(function($root) use ($subscription, $fieldName, &$cachedSubscribers, &$batch) {
             $topic = $subscription->decodeTopic($fieldName, $root);
 
-            $subscribers = $this->subscriptionStorage
-                ->subscribersByTopic($topic)
+            if (! isset($cachedSubscribers[$topic])) {
+                $cachedSubscribers[$topic] = $this->subscriptionStorage
+                    ->subscribersByTopic($topic);
+            }
+
+            $subscribers = $cachedSubscribers[$topic]
                 ->filter(static fn (Subscriber $subscriber): bool => $subscription->filter($subscriber, $root));
 
             $this->subscriptionIterator->process(
