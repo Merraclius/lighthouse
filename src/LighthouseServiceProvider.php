@@ -8,7 +8,7 @@ use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\ServiceProvider;
@@ -27,11 +27,11 @@ use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
-use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
 use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -53,7 +53,7 @@ use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 class LighthouseServiceProvider extends ServiceProvider
 {
     /** @var array<int, class-string<\Illuminate\Console\Command>> */
-    public const COMMANDS = [
+    protected const COMMANDS = [
         CacheCommand::class,
         ClearCacheCommand::class,
         DirectiveCommand::class,
@@ -94,18 +94,16 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesSubscriptionResolver::class, static fn (): ProvidesSubscriptionResolver => new class() implements ProvidesSubscriptionResolver {
             public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
             {
-                throw new \Exception(
-                    'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.',
-                );
+                throw new \Exception('Register the SubscriptionServiceProvider to enable subscriptions.');
             }
         });
 
-        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
+        $this->app->bind(ProvidesValidationRules::class, CacheableValidationRulesProvider::class);
 
         $this->commands(self::COMMANDS);
     }
 
-    public function boot(ConfigRepository $configRepository, Dispatcher $dispatcher): void
+    public function boot(ConfigRepository $configRepository, EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Schema\\Directives');
 
@@ -122,29 +120,27 @@ class LighthouseServiceProvider extends ServiceProvider
         $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
         // @phpstan-ignore-next-line larastan overly eager assumes this will always be a concrete instance
         if ($exceptionHandler instanceof ExceptionHandler) {
-            $exceptionHandler->renderable(
-                function (ClientAware $error): JsonResponse {
-                    assert($error instanceof \Throwable);
+            $exceptionHandler->renderable(function (ClientAware $error): JsonResponse {
+                assert($error instanceof \Throwable);
 
-                    if (! $error instanceof Error) {
-                        $error = new Error(
-                            $error->getMessage(),
-                            null,
-                            null,
-                            [],
-                            null,
-                            $error,
-                            $error instanceof ProvidesExtensions ? $error->getExtensions() : [],
-                        );
-                    }
+                if (! $error instanceof Error) {
+                    $error = new Error(
+                        $error->getMessage(),
+                        null,
+                        null,
+                        [],
+                        null,
+                        $error,
+                        $error instanceof ProvidesExtensions ? $error->getExtensions() : [],
+                    );
+                }
 
-                    $graphQL = $this->app->make(GraphQL::class);
-                    $executionResult = new ExecutionResult(null, [$error]);
-                    $serializableResult = $graphQL->toSerializableArray($executionResult);
+                $graphQL = $this->app->make(GraphQL::class);
+                $executionResult = new ExecutionResult(null, [$error]);
+                $serializableResult = $graphQL->toSerializableArray($executionResult);
 
-                    return new JsonResponse($serializableResult);
-                },
-            );
+                return new JsonResponse($serializableResult);
+            });
         }
     }
 

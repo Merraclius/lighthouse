@@ -20,9 +20,9 @@ GRAPHQL;
     {
         $fieldValue->wrapResolver(
             fn (): callable
-            // Must not crash
-            => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
-                && $this->directiveArgValue('random') === null,
+                // Must not crash
+                => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
+                    && $this->directiveArgValue('random') === null,
         );
     }
 }

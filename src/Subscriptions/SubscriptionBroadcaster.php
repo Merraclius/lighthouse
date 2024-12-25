@@ -20,7 +20,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         protected AuthorizesSubscriptions $subscriptionAuthorizer,
         protected StoresSubscriptions $subscriptionStorage,
         protected SubscriptionIterator $subscriptionIterator,
-        protected BroadcastManager $broadcastManager,
+        protected BroadcastDriverManager $broadcastDriverManager,
         protected BusDispatcher $busDispatcher,
     ) {}
 
@@ -57,7 +57,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $subscriber->variables,
                     $subscriber,
                 );
-                $this->broadcastManager->broadcast($subscriber, $result);
+                $this->broadcastDriverManager->broadcast($subscriber, $result);
             },
         );
     }
@@ -111,7 +111,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     public function authorize(Request $request): Response
     {
         return $this->subscriptionAuthorizer->authorize($request)
-            ? $this->broadcastManager->authorized($request)
-            : $this->broadcastManager->unauthorized($request);
+            ? $this->broadcastDriverManager->authorized($request)
+            : $this->broadcastDriverManager->unauthorized($request);
     }
 }

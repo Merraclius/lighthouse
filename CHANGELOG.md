@@ -9,6 +9,131 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.47.0
+
+### Added
+
+- Support Laravel Reverb as a subscriptions broadcasting driver https://github.com/nuwave/lighthouse/pull/2639
+
+## v6.46.0
+
+### Added
+
+- Allow `@show`, `@hide`, and `@feature` directives to be used on types, arguments and input types https://github.com/nuwave/lighthouse/pull/2638
+
+## v6.45.1
+
+### Fixed
+
+- Fix field middleware directive stub https://github.com/nuwave/lighthouse/commit/21edcfe4762b4b6f14134e8b5c636662f97443ff
+
+## v6.45.0
+
+### Added
+
+- Cache query validation results https://github.com/nuwave/lighthouse/pull/2603
+
+## v6.44.2
+
+### Fixed
+
+- Apply `@convertEmptyStringsToNull` to input fields when used upon fields https://github.com/nuwave/lighthouse/issues/2610
+
+## v6.44.1
+
+### Fixed
+
+- Ensure `deprecationReason` is set on arguments and input fields https://github.com/nuwave/lighthouse/pull/2609
+
+## v6.44.0
+
+### Added
+
+- Allow `@deprecated` directive on arguments and input fields https://github.com/nuwave/lighthouse/pull/2607
+
+## v6.43.1
+
+### Changed
+
+- Improve formatting of `_lighthouse_ide_helper.php` https://github.com/nuwave/lighthouse/pull/2604
+
+## v6.43.0
+
+### Added
+
+- Remove expired members from subscription topic stored in Redis set map https://github.com/nuwave/lighthouse/pull/2601
+
+## v6.42.2
+
+### Fixed
+
+- Restore correct function of nested `HasMany` and `MorphOne` mutations https://github.com/nuwave/lighthouse/pull/2591
+
+## v6.42.1
+
+### Changed
+
+- Improve validation message when using output types as inputs https://github.com/nuwave/lighthouse/pull/2594
+
+## v6.42.0
+
+### Added
+
+- Add `@hasOneThrough` directive https://github.com/nuwave/lighthouse/pull/2585
+
+## v6.41.1
+
+### Fixed
+
+- Handle errors thrown in lifecycle events per operation https://github.com/nuwave/lighthouse/pull/2584
+
+## v6.41.0
+
+### Added
+
+- Add `@withoutGlobalScopes` directive https://github.com/nuwave/lighthouse/pull/2577
+
+## v6.40.0
+
+### Added
+
+- Make `GraphQL::loadPersistedQuery` public https://github.com/nuwave/lighthouse/pull/2579
+
+## v6.39.0
+
+### Added
+
+- Add directives `@createMany`, `@updateMany` and `@upsertMany` to mutate multiple models at once https://github.com/nuwave/lighthouse/pull/2578
+
+### Changed
+
+- Split `MutationExecutorDirective` into `OneModelMutationDirective` and `ManyModelMutationDirective` https://github.com/nuwave/lighthouse/pull/2578
+
+## v6.38.1
+
+### Fixed
+
+- Correct decay value calculation in `@throttle` directive https://github.com/nuwave/lighthouse/pull/2573
+
+## v6.38.0
+
+### Added
+
+- Add option `builder` to `@limit` to apply an actual `LIMIT` clause https://github.com/nuwave/lighthouse/pull/2571
+
+## v6.37.1
+
+### Fixed
+
+- Eliminate redundant `Model::save()` calls in nested mutations https://github.com/nuwave/lighthouse/pull/2570
+
+## v6.37.0
+
+### Changed
+
+- Also report instances of `GraphQL\Error\Error` without previous exceptions in `ReportingErrorHandler` https://github.com/nuwave/lighthouse/pull/2567
+- Report all errors thrown during the execution of async mutations regardless of client-safety https://github.com/nuwave/lighthouse/pull/2567
+
 ## v6.36.3
 
 ### Fixed
@@ -2214,7 +2339,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   with the latest changes in the base configuration file https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
 - The pagination field argument that controls the amount of results
-  now default tos `first` instead of `count`. The config `pagination_amount_argument`
+  now defaults to `first` instead of `count`. The config `pagination_amount_argument`
   can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 - Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 - Make the argument used for finding a model to check `@can` against configurable.

@@ -136,6 +136,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Validation Cache
+    |--------------------------------------------------------------------------
+    |
+    | Caches the result of validating queries to boost performance on subsequent requests.
+    |
+    */
+
+    'validation_cache' => [
+        /*
+         * Setting to true enables validation caching.
+         */
+        'enable' => env('LIGHTHOUSE_VALIDATION_CACHE_ENABLE', false),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_VALIDATION_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds the validation result should remain cached, null means forever.
+         */
+        'ttl' => env('LIGHTHOUSE_VALIDATION_CACHE_TTL', 24 * 60 * 60),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Parse source location
     |--------------------------------------------------------------------------
     |
@@ -409,15 +435,20 @@ return [
             'log' => [
                 'driver' => 'log',
             ],
-            'pusher' => [
-                'driver' => 'pusher',
-                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
-                'connection' => 'pusher',
-            ],
             'echo' => [
                 'driver' => 'echo',
                 'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
                 'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
+            ],
+            'pusher' => [
+                'driver' => 'pusher',
+                'connection' => 'pusher',
+                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
+            ],
+            'reverb' => [
+                'driver' => 'pusher',
+                'connection' => 'reverb',
+                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@reverb',
             ],
         ],
 
