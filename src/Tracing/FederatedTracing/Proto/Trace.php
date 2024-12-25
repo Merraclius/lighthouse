@@ -164,6 +164,13 @@ class Trace extends \Google\Protobuf\Internal\Message
     protected $field_execution_weight = 0.0;
 
     /**
+     * The limits information of the query.
+     *
+     * Generated from protobuf field <code>.Trace.Limits limits = 32 [json_name = "limits"];</code>
+     */
+    protected $limits;
+
+    /**
      * Constructor.
      *
      * @param  array  $data {
@@ -235,6 +242,8 @@ class Trace extends \Google\Protobuf\Internal\Message
      *           towards the estimated_execution_count rather than just 1. This value should
      *           typically be at least 1.
      *           0 is treated as 1 for backwards compatibility.
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits $limits
+     *           The limits information of the query.
      * }
      */
     public function __construct($data = null)
@@ -975,6 +984,45 @@ class Trace extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkDouble($var);
         $this->field_execution_weight = $var;
+
+        return $this;
+    }
+
+    /**
+     * The limits information of the query.
+     *
+     * Generated from protobuf field <code>.Trace.Limits limits = 32 [json_name = "limits"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits|null
+     */
+    public function getLimits()
+    {
+        return $this->limits;
+    }
+
+    public function hasLimits()
+    {
+        return isset($this->limits);
+    }
+
+    public function clearLimits()
+    {
+        unset($this->limits);
+    }
+
+    /**
+     * The limits information of the query.
+     *
+     * Generated from protobuf field <code>.Trace.Limits limits = 32 [json_name = "limits"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits  $var
+     *
+     * @return $this
+     */
+    public function setLimits($var)
+    {
+        GPBUtil::checkMessage($var, Trace\Limits::class);
+        $this->limits = $var;
 
         return $this;
     }

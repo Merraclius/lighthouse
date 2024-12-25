@@ -13,12 +13,12 @@ class NestedOneToOne implements ArgResolver
     ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  ArgumentSet  $args
      */
-    public function __invoke($parent, $args): void
+    public function __invoke($model, $args): void
     {
-        $relation = $parent->{$this->relationName}();
+        $relation = $model->{$this->relationName}();
         assert($relation instanceof HasOne || $relation instanceof MorphOne);
 
         if ($args->has('create')) {

@@ -14,10 +14,12 @@ final class UpsertDirectiveTest extends DBTestCase
     public function testNestedArgResolver(): void
     {
         factory(User::class)->create();
-        factory(Task::class)->create([
-            'id' => 1,
-            'name' => 'old',
-        ]);
+
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+        $task->id = 1;
+        $task->name = 'old';
+        $task->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -91,6 +93,7 @@ final class UpsertDirectiveTest extends DBTestCase
     public function testNestedInsertOnInputList(): void
     {
         factory(User::class)->create();
+
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
@@ -158,14 +161,14 @@ final class UpsertDirectiveTest extends DBTestCase
     {
         $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
         type Mutation {
-            upsertUser(input: UpsertUserInput! @spread): IUser @upsert
+            upsertUser(input: UpsertUserInput! @spread): IUser! @upsert
         }
 
         interface IUser
-        @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
-        @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
-            name: String
-        }
+            @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
+            @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
+                name: String
+            }
 
         type Admin implements IUser {
             id: ID!

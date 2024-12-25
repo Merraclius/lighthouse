@@ -8,8 +8,8 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Http\Responses\MemoryStream;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use PHPUnit\Framework\Assert;
@@ -27,6 +27,8 @@ trait MakesGraphQLRequests
      *
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
+     *
+     * @var \Illuminate\Testing\TestResponse<\Symfony\Component\HttpFoundation\Response>
      */
     protected TestResponse $introspectionResult;
 
@@ -244,11 +246,11 @@ trait MakesGraphQLRequests
             $config->get('lighthouse.subscriptions.broadcasters.log'),
         ));
 
-        $broadcastManager = $app->make(BroadcastManager::class);
-        assert($broadcastManager instanceof BroadcastManager);
+        $broadcastDriverManager = $app->make(BroadcastDriverManager::class);
+        assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
         // adding a custom driver which is a spied version of log driver
-        $broadcastManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
+        $broadcastDriverManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
 
         // set the custom driver as the default driver
         $config->set('lighthouse.subscriptions.broadcaster', 'mock');

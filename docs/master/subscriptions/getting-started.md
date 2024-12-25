@@ -9,19 +9,26 @@ Much of the credit should be given to the [Ruby implementation](https://github.c
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
+Register the service provider `Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider::class,
-],
-```
-
-If you want to use the Pusher driver, you need to install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for interacting with the Pusher HTTP API.
+If you want to use [the Pusher driver](https://laravel.com/docs/11.x/broadcasting#pusher-channels), you need to install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php)
+for interacting with the Pusher HTTP API.
 
     composer require pusher/pusher-php-server
 
-If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_BROADCASTER=echo`.
+If you want to use [the Laravel Echo driver](https://laravel.com/docs/broadcasting#client-side-installation),
+you need to set the env `LIGHTHOUSE_BROADCASTER=echo`.
+
+When using subscriptions with [Laravel Octane](https://laravel.com/docs/octane),
+add the following to your `config/octane.php`:
+
+```php
+    'warm' => [
+        ...Octane::defaultServicesToWarm(),
+        Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry::class,
+    ],
+```
 
 ### Empty Response Optimization
 
