@@ -69,7 +69,7 @@ class PusherBroadcaster implements Broadcaster
         }
     }
 
-    public function broadcastBatch(array $batch): void
+   /* public function broadcastBatch(Subscriber $subscriber, mixed $batch): void
     {
         try {
             $preparedBatch = [];
@@ -92,5 +92,5 @@ class PusherBroadcaster implements Broadcaster
         } catch (ApiErrorException $apiErrorException) {
             $this->exceptionHandler->report($apiErrorException);
         }
-    }
+    }*/
 }
