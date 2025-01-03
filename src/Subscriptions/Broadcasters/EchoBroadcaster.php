@@ -22,6 +22,13 @@ class EchoBroadcaster implements Broadcaster
         );
     }
 
+    public function broadcastBatch(array $batch): void
+    {
+        foreach ($batch as $data) {
+            $this->broadcast($data['subscriber'], $data['result']);
+        }
+    }
+
     public function authorized(Request $request): JsonResponse
     {
         $userId = md5(

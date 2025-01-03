@@ -35,9 +35,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void
     {
         if ($root instanceof Collection) {
-            $root->each(function($root) use ($subscription, $fieldName) {
-                $this->broadcast($subscription, $fieldName, $root);
-            });
+            $this->broadcastBatch($subscription, $fieldName, $root);
 
             return;
         }
@@ -64,7 +62,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         );
     }
 
-    /*private function broadcastBatch(GraphQLSubscription $subscription, string $fieldName, Collection $roots): void
+    private function broadcastBatch(GraphQLSubscription $subscription, string $fieldName, Collection $roots): void
     {
         $batch = [];
         $cachedSubscribers = [];
@@ -108,7 +106,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         if (count($batch) > 0) {
             $this->broadcastDriverManager->broadcastBatch($batch);
         }
-    }*/
+    }
 
     public function authorize(Request $request): Response
     {

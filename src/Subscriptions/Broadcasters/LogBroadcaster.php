@@ -52,6 +52,13 @@ class LogBroadcaster implements Broadcaster
         $this->broadcasts[$subscriber->channel] = $data;
     }
 
+    public function broadcastBatch(array $batch): void
+    {
+        foreach ($batch as $data) {
+            $this->broadcast($data['subscriber'], $data['result']);
+        }
+    }
+
     /** @return mixed The data that is being broadcast */
     public function broadcasts(?string $key = null): mixed
     {
