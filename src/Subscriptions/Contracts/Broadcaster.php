@@ -21,4 +21,7 @@ interface Broadcaster
 
     /** Send data to subscriber. */
     public function broadcast(Subscriber $subscriber, mixed $data): void;
+
+    /** Send batch data to subscriber. */
+    public function broadcastBatch(array $batch): void;
 }
