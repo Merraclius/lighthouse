@@ -31,7 +31,6 @@ class BroadcastSubscriptionJob implements ShouldQueue
 
     public function handle(BroadcastsSubscriptions $broadcaster): void
     {
-        Log::info("BroadcastSubscriptionJob", ['time' => microtime(true)]);
         $broadcaster->broadcast($this->subscription, $this->fieldName, $this->root);
     }
 }
