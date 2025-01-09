@@ -41,46 +41,24 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
             return;
         }
 
-        $time = microtime(true);
         $topic = $subscription->decodeTopic($fieldName, $root);
-        Log::info('SubscriptionBroadcaster@broadcast decodeTopic', [
-            'time' => microtime(true) - $time,
-        ]);
 
-        $time = microtime(true);
         $subscribers = $this->subscriptionStorage
             ->subscribersByTopic($topic)
             ->filter(static fn (Subscriber $subscriber): bool => $subscription->filter($subscriber, $root));
-        Log::info('SubscriptionBroadcaster@broadcast subscribersByTopic filter', [
-            'time' => microtime(true) - $time,
-        ]);
-
-        Log::info('SubscriptionBroadcaster@broadcast', [
-            'subscribers' => $subscribers,
-            'root' => $root,
-        ]);
 
         $this->subscriptionIterator->process(
             $subscribers,
             function (Subscriber $subscriber) use ($root): void {
                 $subscriber->root = $root;
 
-                $time = microtime(true);
                 $result = $this->graphQL->executeParsedQuery(
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->variables,
                     $subscriber,
                 );
-                Log::info('SubscriptionBroadcaster@broadcast executeParsedQuery', [
-                    'time' => microtime(true) - $time,
-                ]);
-
-                $time = microtime(true);
                 $this->broadcastDriverManager->broadcast($subscriber, $result);
-                Log::info('SubscriptionBroadcaster@broadcast broadcastDriverManager broadcast', [
-                    'time' => microtime(true) - $time,
-                ]);
             },
         );
     }
@@ -100,11 +78,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
             $subscribers = $cachedSubscribers[$topic]
                 ->filter(static fn (Subscriber $subscriber): bool => $subscription->filter($subscriber, $root));
-
-            Log::info('SubscriptionBroadcaster@broadcastBatch', [
-                'subscribers' => $subscribers,
-                'root' => $root,
-            ]);
 
             $this->subscriptionIterator->process(
                 $subscribers,
