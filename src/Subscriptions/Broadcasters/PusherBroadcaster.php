@@ -88,7 +88,7 @@ class PusherBroadcaster implements Broadcaster
                 ];
             }
 
-            $this->pusher->triggerBatchAsync($preparedBatch);
+            $this->pusher->triggerBatch($preparedBatch);
         } catch (ApiErrorException $apiErrorException) {
             $this->exceptionHandler->report($apiErrorException);
         }
