@@ -56,6 +56,8 @@ final class BroadcastDriverManagerTest extends TestCase
             }
 
             public function broadcast(Subscriber $subscriber, mixed $data): void {}
+
+            public function broadcastBatch(array $batch): void {}
         };
 
         $this->broadcastDriverManager->extend('foo', static function ($app, array $config) use (&$broadcasterConfig, $broadcaster): Broadcaster {

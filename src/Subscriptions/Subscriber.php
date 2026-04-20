@@ -84,25 +84,35 @@ class Subscriber
     }
 
     /** Generate a unique private channel name. */
-    public static function uniqueChannelName($base): string
+    public static function uniqueChannelName($base = null): string
     {
+        if ($base === null) {
+            $base = self::channelNameBase();
+        }
+
         return $base.Str::random(32).'-'.time();
     }
 
     /** Generate a private channel name. */
     public static function channelName($postfix = null): string
     {
-        $channelType = config('lighthouse.subscriptions.encrypted_channels', false)
-            ? 'private-encrypted'
-            : 'private';
-
-        $nameBase = $channelType . '-lighthouse-';
+        $nameBase = self::channelNameBase();
 
         if (empty($postfix)) {
             return self::uniqueChannelName($nameBase);
         }
 
         return $nameBase.$postfix;
+    }
+
+    /** Prefix used for every subscription channel, honours encrypted_channels config. */
+    private static function channelNameBase(): string
+    {
+        $channelType = config('lighthouse.subscriptions.encrypted_channels', false)
+            ? 'private-encrypted'
+            : 'private';
+
+        return $channelType . '-lighthouse-';
     }
 
     /** @return array<string, mixed> */
