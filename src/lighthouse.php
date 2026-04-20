@@ -24,8 +24,8 @@ return [
         'name' => 'graphql',
 
         /*
-         * Beware that middleware defined here runs before the GraphQL execution phase,
-         * make sure to return spec-compliant responses in case an error is thrown.
+         * Beware that middleware defined here runs before the GraphQL execution phase.
+         * Make sure to return spec-compliant responses in case an error is thrown.
          */
         'middleware' => [
             // Ensures the request is not vulnerable to cross-site request forgery.
@@ -124,12 +124,28 @@ return [
         'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
 
         /*
+         * Configures which mechanism to use for the query cache.
+         * - store: use an external shared cache through a Laravel cache store like Redis or Memcached
+         * - opcache: store parsed queries in PHP files on the local filesystem to leverage OPcache
+         * - hybrid: leverage OPcache, but use a shared cache store when local files are not found
+         */
+        'mode' => env('LIGHTHOUSE_QUERY_CACHE_MODE', 'store'),
+
+        /*
+         * Specifies the path where the PHP files are stored when using opcache or hybrid mode.
+         * The given path must be a folder, as every query will produce its own file.
+         */
+        'opcache_path' => env('LIGHTHOUSE_QUERY_CACHE_OPCACHE_PATH', base_path('bootstrap/cache')),
+
+        /*
          * Allows using a specific cache store, uses the app's default if set to null.
+         * Not relevant when using opcache mode.
          */
         'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
 
         /*
          * Duration in seconds the query should remain cached, null means forever.
+         * Not relevant when using opcache mode.
          */
         'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
     ],
@@ -417,11 +433,16 @@ return [
         /*
          * Default subscription storage time to live in seconds.
          *
-         * Indicates how long a subscription can be active before it's automatically removed from storage.
+         * Indicates how long a subscription can stay active before automatic removal from storage.
          * Setting this to `null` means the subscriptions are stored forever. This may cause
          * stale subscriptions to linger indefinitely in case cleanup fails for any reason.
          */
         'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
+
+        /*
+         * Encrypt subscription channels by prefixing their names with "private-encrypted-"?
+         */
+        'encrypted_channels' => env('LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED', false),
 
         /*
          * Default subscription broadcaster.
@@ -454,7 +475,8 @@ return [
 
         /*
          * Should the subscriptions extension be excluded when the response has no subscription channel?
-         * This optimizes performance by sending less data, but clients must anticipate this appropriately.
+         * This optimizes performance by sending less data.
+         * Clients must anticipate this behavior.
          */
         'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', true),
     ],

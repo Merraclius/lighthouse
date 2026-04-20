@@ -54,7 +54,7 @@ class ASTHelper
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
      * @param  bool  $overwriteDuplicates  By default, this function throws if a collision occurs.
-     *                                     If set to true, the fields of the original list will be overwritten.
+     * If set to true, the fields of the original list will be overwritten.
      *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
@@ -71,9 +71,7 @@ class ASTHelper
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
                 if ($collisionOccurred && ! $overwriteDuplicates) {
-                    throw new DefinitionException(
-                        static::duplicateDefinition($oldName),
-                    );
+                    throw new DefinitionException(static::duplicateDefinition($oldName));
                 }
 
                 return $collisionOccurred;
@@ -284,7 +282,7 @@ class ASTHelper
         return static::hasNode($type->interfaces, $interfaceName);
     }
 
-    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
+    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeWithFields): void
     {
         $name = $directiveNode->name->value;
 
@@ -310,9 +308,9 @@ class ASTHelper
     /**
      * Create a fully qualified base for a generated name that belongs to an argument.
      *
-     * We have to make sure it is unique in the schema. Even though
-     * this name becomes a bit verbose, it is also very unlikely to collide
-     * with a random user defined type.
+     * We have to make sure it is unique in the schema.
+     * This name is a bit verbose.
+     * It is very unlikely to collide with a random user-defined type.
      *
      * @example ParentNameFieldNameArgName
      */
@@ -342,11 +340,7 @@ class ASTHelper
         try {
             $document = Parser::parse($definitionString);
         } catch (SyntaxError $syntaxError) {
-            throw new DefinitionException(
-                "Encountered syntax error while parsing this directive definition:\n\n{$definitionString}",
-                $syntaxError->getCode(),
-                $syntaxError,
-            );
+            throw new DefinitionException("Encountered syntax error while parsing this directive definition:\n\n{$definitionString}", $syntaxError->getCode(), $syntaxError);
         }
 
         /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */

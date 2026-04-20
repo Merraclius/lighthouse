@@ -42,6 +42,7 @@ class ContextSerializer implements SerializesContext
         [
             'request' => $rawRequest,
             'user' => $rawUser
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         ] = unserialize($context);
 
         if ($rawRequest) {
@@ -54,7 +55,7 @@ class ContextSerializer implements SerializesContext
                 $rawRequest['server'],
                 $rawRequest['content'],
             );
-            $request->setUserResolver(fn () => $this->getRestoredPropertyValue($rawUser));
+            $request->setUserResolver(fn (): mixed => $this->getRestoredPropertyValue($rawUser));
         } else {
             $request = null;
         }

@@ -74,6 +74,8 @@ trait MakesGraphQLRequests
      */
     protected function postGraphQL(array $data, array $headers = [], array $routeParams = []): TestResponse
     {
+        $this->refreshSchemaCacheIfNecessary();
+
         return $this->postJson(
             $this->graphQLEndpointUrl($routeParams),
             $data,
@@ -100,6 +102,8 @@ trait MakesGraphQLRequests
         array $headers = [],
         array $routeParams = [],
     ): TestResponse {
+        $this->refreshSchemaCacheIfNecessary();
+
         $parameters = [
             'operations' => \Safe\json_encode($operations),
             'map' => \Safe\json_encode($map),
@@ -242,17 +246,23 @@ trait MakesGraphQLRequests
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container, so it can be spied on
-        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster => new LogBroadcaster(
+        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): LogBroadcaster => new LogBroadcaster(
             $config->get('lighthouse.subscriptions.broadcasters.log'),
         ));
 
         $broadcastDriverManager = $app->make(BroadcastDriverManager::class);
-        assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
         // adding a custom driver which is a spied version of log driver
         $broadcastDriverManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
 
         // set the custom driver as the default driver
         $config->set('lighthouse.subscriptions.broadcaster', 'mock');
+    }
+
+    protected function refreshSchemaCacheIfNecessary(): void
+    {
+        if (in_array(RefreshesSchemaCache::class, class_uses_recursive(static::class), true)) {
+            $this->refreshSchemaCache(); // @phpstan-ignore method.notFound (present in RefreshesSchemaCache)
+        }
     }
 }

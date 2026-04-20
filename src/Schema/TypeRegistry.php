@@ -58,7 +58,7 @@ class TypeRegistry
     /**
      * Map from type names to lazily resolved types.
      *
-     * @var array<string, callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
+     * @var array<string, callable(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)>
      */
     protected array $lazyTypes = [];
 
@@ -168,7 +168,7 @@ class TypeRegistry
      *
      * @api
      *
-     * @param  callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
+     * @param  callable(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)  $type
      */
     public function registerLazy(string $name, callable $type): self
     {
@@ -200,7 +200,7 @@ class TypeRegistry
      *
      * @api
      *
-     * @param  callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
+     * @param  callable(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)  $type
      */
     public function overwriteLazy(string $name, callable $type): self
     {
@@ -242,8 +242,8 @@ class TypeRegistry
     /**
      * Get the types that are currently resolved.
      *
-     * This does not return all possible types, only those that
-     * are programmatically registered or already resolved.
+     * This does not return all possible types.
+     * It returns only types that are programmatically registered or already resolved.
      *
      * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
@@ -268,7 +268,6 @@ class TypeRegistry
             ->associatedOfType($definition, TypeMiddleware::class)
             ->all();
         foreach ($typeMiddlewareDirectives as $typeMiddlewareDirective) {
-            assert($typeMiddlewareDirective instanceof TypeMiddleware);
             $typeMiddlewareDirective->handleNode($typeValue);
         }
 

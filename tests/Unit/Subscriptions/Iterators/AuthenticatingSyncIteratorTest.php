@@ -33,6 +33,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
                 return $subscriber;
             });
 
+        // @phpstan-ignore argument.type (callable for parameter 2 not recognized)
         $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers): void {
             $subscribers->each(static function (Subscriber $subscriber) use ($mock): void {
                 $user = $subscriber->context->user();
@@ -54,9 +55,8 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
         });
 
         $authManager = $this->app->make(AuthManager::class);
-        assert($authManager instanceof AuthManager);
 
-        $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn (): SubscriptionGuard => $guard);
+        $authManager->extend(SubscriptionGuard::GUARD_NAME, fn (): SubscriptionGuard => $guard);
 
         $processedItems = [];
         $authenticatedUsers = [];
@@ -79,7 +79,9 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
 
 final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
-    public function __construct(private int $id) {}
+    public function __construct(
+        private int $id,
+    ) {}
 
     public function getAuthIdentifierName()
     {

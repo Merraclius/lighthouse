@@ -21,7 +21,9 @@ use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node;
 use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingUtilities;
 
-/** See https://www.apollographql.com/docs/federation/metrics. */
+/**
+ * See https://www.apollographql.com/docs/federation/metrics.
+ */
 class FederatedTracing implements Tracing
 {
     use TracingUtilities;
@@ -101,7 +103,7 @@ class FederatedTracing implements Tracing
             $this->recordError($resultError);
         }
 
-        assert($this->trace !== null);
+        assert($this->trace !== null); // @phpstan-ignore notIdentical.alwaysTrue (control flow not understood)
 
         return new ExtensionsResponse(
             self::V1,
@@ -146,8 +148,8 @@ class FederatedTracing implements Tracing
     /** @param  array<int, int|string>  $path */
     protected function findOrNewNode(array $path): Node
     {
-        assert($this->trace !== null);
-        assert($this->trace->getRoot() !== null);
+        assert($this->trace !== null); // @phpstan-ignore notIdentical.alwaysTrue (control flow not understood)
+        assert($this->trace->getRoot() !== null); // @phpstan-ignore notIdentical.alwaysTrue (control flow not understood)
 
         if ($path === []) {
             return $this->trace->getRoot();

@@ -19,8 +19,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
+ *
+ * @deprecated lumen support will be removed in the next major version
  */
-trait MakesGraphQLRequestsLumen
+trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up testing for)
 {
     /**
      * Stores the result of the introspection query.
@@ -261,7 +263,7 @@ trait MakesGraphQLRequestsLumen
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container, so it can be spied on
-        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster => new LogBroadcaster(
+        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): LogBroadcaster => new LogBroadcaster(
             $config->get('lighthouse.subscriptions.broadcasters.log'),
         ));
 

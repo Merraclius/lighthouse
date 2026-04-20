@@ -2,11 +2,11 @@
  
 - [ ] Added or updated tests
 - [ ] Documented user facing changes
-- [ ] Updated CHANGELOG.md
+- [ ] Updated CHANGELOG.md (skip for docs-only changes)
 
 **Changes**
 
-<!-- Detail the changes in behaviour this PR introduces. -->
+<!-- Detail the changes in behavior this PR introduces. -->
 
 **Breaking changes**
 

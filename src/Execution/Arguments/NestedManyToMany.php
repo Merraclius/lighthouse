@@ -83,9 +83,8 @@ class NestedManyToMany implements ArgResolver
     /**
      * Generate an array for passing into sync, syncWithoutDetaching or connect method.
      *
-     * Those functions natively have the capability of passing additional
-     * data to store in the pivot table. That array expects passing the id's
-     * as keys, so we transform the passed arguments to match that.
+     * Those functions can natively pass additional data for storage in the pivot table.
+     * That array expects passing the IDs as keys, so we transform the passed arguments to match that.
      *
      * @return array<mixed>
      */
@@ -97,8 +96,8 @@ class NestedManyToMany implements ArgResolver
             return [];
         }
 
-        // Since GraphQL inputs are monomorphic, we can just look at the first
-        // given value and can deduce the value of all given args.
+        // Since GraphQL inputs are monomorphic, we can look at the first
+        // given value for an argument and deduce the type of all values.
         $exemplaryValue = $values[0];
 
         // We assume that the values contain pivot information

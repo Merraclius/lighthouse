@@ -8,14 +8,16 @@ use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-/** TODO remove with v7 */
+/**
+ * TODO remove with v7.
+ */
 final class CanDirectiveTest extends TestCase
 {
     public function testThrowsIfNotAuthorized(): void
     {
         $this->be(new User());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: "adminOnly")
@@ -25,22 +27,22 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        GRAPHQL)->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
     {
         $this->be(new User());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: "superAdminOnly")
@@ -50,16 +52,16 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     name
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
@@ -67,7 +69,7 @@ final class CanDirectiveTest extends TestCase
     {
         $this->be(new User());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: ["superAdminOnly", "adminOnly"])
@@ -77,16 +79,16 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     name
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
@@ -98,7 +100,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: "adminOnly")
@@ -108,15 +110,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -133,7 +135,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: "view", resolved: true)
@@ -143,15 +145,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -164,7 +166,7 @@ final class CanDirectiveTest extends TestCase
     {
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: "guestOnly")
@@ -174,15 +176,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -199,7 +201,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: ["adminOnly", "alwaysTrue"])
@@ -209,15 +211,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -228,7 +230,7 @@ final class CanDirectiveTest extends TestCase
 
     public function testProcessesTheArgsArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User!
                 @can(ability: "dependingOnArg", args: [false])
@@ -238,15 +240,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        GRAPHQL)->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void
@@ -255,7 +257,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(foo: String): User!
                 @can(ability: "injectArgs", injectArgs: true)
@@ -265,15 +267,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(foo: "bar") {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -288,7 +290,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(foo: String): User! @mock
         }
@@ -297,16 +299,16 @@ final class CanDirectiveTest extends TestCase
             name: String @can(ability: "view", root: true)
             email: String @can(ability: "superAdminOnly", root: true)
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(foo: "bar") {
                 name
                 email
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -324,7 +326,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(foo: String): User!
                 @can(
@@ -338,15 +340,15 @@ final class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
-            user(foo: "dynamic"){
+            user(foo: "dynamic") {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -367,10 +369,10 @@ final class CanDirectiveTest extends TestCase
     public function testThrowsIfResolvedIsUsedOnMutation(): void
     {
         $this->expectExceptionObject(CanDirective::resolvedIsUnsafeInMutations('foo'));
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             foo: ID @can(resolved: true)
         }
-        ');
+        GRAPHQL);
     }
 }

@@ -19,13 +19,13 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_80,
         PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);
     $rectorConfig->rule(Rector\CodingStyle\Rector\Closure\StaticClosureRector::class);
     $rectorConfig->skip([
         __DIR__ . '/src/Tracing/FederatedTracing/Proto', // Generated code
         __DIR__ . '/tests/database/migrations', // Does not fit autoloader standards
         __DIR__ . '/tests/LaravelPhpdocAlignmentFixer.php', // Copied from Laravel
+        __DIR__ . '/tests/Unit/Schema/Directives/MethodDirectiveTest.php', // System error: "Undefined array key 0"
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class => [
@@ -39,7 +39,7 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector::class => [
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
-            __DIR__ . '/benchmarks/QueryBench.php', // setUp serves a double purpose here
+            __DIR__ . '/benchmarks/BenchmarkTestCase.php', // exposes protected methods
         ],
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class, // if($truthy) is fine and very readable
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
@@ -48,7 +48,7 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
         Rector\PHPUnit\PHPUnit100\Rector\StmtsAwareInterface\WithConsecutiveRector::class, // messes up our custom withConsecutive replacement
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class, // does not recognize mockResolver
-        Rector\Php80\Rector\FunctionLike\MixedTypeRector::class, // removes useful comments
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector::class, // Makes assertions more brittle
     ]);
     $rectorConfig->paths([
         __DIR__ . '/benchmarks',
@@ -58,5 +58,12 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/_ide_helper.php',
         __DIR__ . '/rector.php',
     ]);
-    $rectorConfig->phpstanConfig(__DIR__ . '/phpstan.neon');
+    $rectorConfig->bootstrapFiles([
+        // Rector uses PHPStan internally, which in turn requires Larastan to be set up correctly
+        __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
+    ]);
+    $rectorConfig->phpstanConfigs([
+        __DIR__ . '/phpstan.neon',
+        __DIR__ . '/vendor/larastan/larastan/extension.neon',
+    ]);
 };

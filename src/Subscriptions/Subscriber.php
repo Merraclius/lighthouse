@@ -18,8 +18,9 @@ class Subscriber
     /**
      * A unique key for the subscriber's channel.
      *
-     * This has to be unique for each subscriber, because each of them can send a different
-     * query and must receive a response that is specifically tailored towards that.
+     * This has to be unique for each subscriber.
+     * Each of them can send a different query.
+     * Each must receive a response tailored to that query.
      */
     public string $channel;
 
@@ -91,7 +92,11 @@ class Subscriber
     /** Generate a private channel name. */
     public static function channelName($postfix = null): string
     {
-        $nameBase = 'private-lighthouse-';
+        $channelType = config('lighthouse.subscriptions.encrypted_channels', false)
+            ? 'private-encrypted'
+            : 'private';
+
+        $nameBase = $channelType . '-lighthouse-';
 
         if (empty($postfix)) {
             return self::uniqueChannelName($nameBase);
@@ -124,6 +129,7 @@ class Subscriber
         $this->topic = $data['topic'];
 
         $documentNode = AST::fromArray(
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             unserialize($data['query']),
         );
         assert($documentNode instanceof DocumentNode,

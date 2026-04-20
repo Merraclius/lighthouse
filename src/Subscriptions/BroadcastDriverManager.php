@@ -12,8 +12,8 @@ use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
 
 /**
- * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
- * @method void broadcastBatch(array $data)
+ * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array<string, mixed> $data)
+ * @method void broadcastBatch(array<int, array{subscriber: \Nuwave\Lighthouse\Subscriptions\Subscriber, result: array<string, mixed>}> $data)
  * @method \Symfony\Component\HttpFoundation\Response hook(\Illuminate\Http\Request $request)
  * @method \Symfony\Component\HttpFoundation\Response authorized(\Illuminate\Http\Request $request)
  * @method \Symfony\Component\HttpFoundation\Response unauthorized(\Illuminate\Http\Request $request)
