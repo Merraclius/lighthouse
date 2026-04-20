@@ -39,9 +39,13 @@ final class SerializerTest extends DBTestCase
             $serializer->serialize($context),
         );
 
-        $this->assertTrue($retrievedFromDatabase);
+        // User retrieval is now deferred so SubscriptionBroadcaster can batch
+        // preload across subscribers. It fires on first $context->user() call.
+        $this->assertFalse($retrievedFromDatabase);
 
         $unserializedUser = $unserialized->user();
+
+        $this->assertTrue($retrievedFromDatabase);
         $this->assertNotNull($unserializedUser);
         $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }

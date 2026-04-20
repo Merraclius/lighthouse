@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Http\Request;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Illuminate\Support\Arr;
@@ -55,11 +56,23 @@ class ContextSerializer implements SerializesContext
                 $rawRequest['server'],
                 $rawRequest['content'],
             );
-            $request->setUserResolver(fn (): mixed => $this->getRestoredPropertyValue($rawUser));
+            // Intentionally do NOT wire a user resolver that triggers
+            // getRestoredPropertyValue() here. Doing so causes
+            // HttpGraphQLContext::__construct to fire one SELECT on users
+            // per subscriber during subscribersByTopic unserialize — an N+1
+            // when broadcasting to many subscribers. The identifier is
+            // attached to the resulting context below so that
+            // SubscriptionBroadcaster can batch-load users in a single query.
         } else {
             $request = null;
         }
 
-        return $this->createsContext->generate($request);
+        $context = $this->createsContext->generate($request);
+
+        if ($rawUser instanceof ModelIdentifier && $context instanceof HttpGraphQLContext) {
+            $context->userIdentifier = $rawUser;
+        }
+
+        return $context;
     }
 }

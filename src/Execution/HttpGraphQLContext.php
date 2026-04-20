@@ -3,14 +3,26 @@
 namespace Nuwave\Lighthouse\Execution;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Http\Request;
+use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class HttpGraphQLContext implements GraphQLContext
 {
+    use SerializesAndRestoresModelIdentifiers;
+
     /** An instance of the currently authenticated user. */
     public ?Authenticatable $user = null;
+
+    /**
+     * Deferred user identifier used when the context was restored from a
+     * subscription payload. Set by ContextSerializer::unserialize() so that
+     * SubscriptionBroadcaster can batch-resolve users across subscribers
+     * instead of triggering one SELECT per subscriber.
+     */
+    public ?ModelIdentifier $userIdentifier = null;
 
     public function __construct(
         /** An instance of the incoming HTTP request. */
@@ -27,6 +39,13 @@ class HttpGraphQLContext implements GraphQLContext
 
     public function user(): ?Authenticatable
     {
+        if ($this->user === null && $this->userIdentifier !== null) {
+            $resolved = $this->getRestoredPropertyValue($this->userIdentifier);
+            if ($resolved instanceof Authenticatable) {
+                $this->user = $resolved;
+            }
+        }
+
         return $this->user;
     }
 
