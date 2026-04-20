@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 /**
- * This directive exists as a placeholder
+ * This directive exists as a placeholder.
  *
  * @see \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
  */

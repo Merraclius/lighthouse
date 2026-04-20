@@ -69,7 +69,7 @@ class PusherBroadcaster implements Broadcaster
         }
     }
 
-   public function broadcastBatch(array $batch): void
+    public function broadcastBatch(array $batch): void
     {
         try {
             $preparedBatch = [];
