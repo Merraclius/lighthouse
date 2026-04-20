@@ -90,7 +90,7 @@ class Subscriber
             $base = self::channelNameBase();
         }
 
-        return $base.Str::random(32).'-'.time();
+        return $base . Str::random(32) . '-' . time();
     }
 
     /** Generate a private channel name. */
@@ -102,7 +102,7 @@ class Subscriber
             return self::uniqueChannelName($nameBase);
         }
 
-        return $nameBase.$postfix;
+        return $nameBase . $postfix;
     }
 
     /** Prefix used for every subscription channel, honours encrypted_channels config. */
@@ -142,8 +142,10 @@ class Subscriber
             // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             unserialize($data['query']),
         );
-        assert($documentNode instanceof DocumentNode,
-            'We know the type since it is set during construction and serialized.');
+        assert(
+            $documentNode instanceof DocumentNode,
+            'We know the type since it is set during construction and serialized.',
+        );
 
         $this->socket_id = $data['socket_id'];
         $this->query = $documentNode;
@@ -156,7 +158,6 @@ class Subscriber
     }
 
     /**
-     * @param  ResolveInfo  $resolveInfo
      * @return mixed|null
      */
     public function getChannelPostfix(ResolveInfo $resolveInfo): mixed
@@ -166,20 +167,20 @@ class Subscriber
         if (isset($resolveInfo->fieldDefinition->astNode)) {
             $directive = ASTHelper::directiveDefinition(
                 $resolveInfo->fieldDefinition->astNode,
-                SharedDirective::NAME
+                SharedDirective::NAME,
             );
             $channelPostfixBase = $directive === null ? null : ASTHelper::directiveArgValue(
                 $directive,
-                'name'
+                'name',
             );
 
             if ($channelPostfixBase !== null) {
-                if (!empty($resolveInfo->variableValues)) {
+                if (! empty($resolveInfo->variableValues)) {
                     $variables = $resolveInfo->variableValues;
 
                     sort($variables);
 
-                    $channelPostfix = $channelPostfixBase.'-'.md5(json_encode($variables));
+                    $channelPostfix = $channelPostfixBase . '-' . md5(json_encode($variables));
                 } else {
                     $channelPostfix = $channelPostfixBase;
                 }

@@ -7,7 +7,6 @@ use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -77,7 +76,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $batch = [];
         $cachedSubscribers = [];
 
-        $roots->each(function($root) use ($subscription, $fieldName, &$cachedSubscribers, &$batch) {
+        $roots->each(function ($root) use ($subscription, $fieldName, &$cachedSubscribers, &$batch) {
             $topic = $subscription->decodeTopic($fieldName, $root);
 
             if (! isset($cachedSubscribers[$topic])) {
@@ -143,7 +142,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     private function batchPreloadContextUsers(Collection $subscribers): void
     {
-        /** @var array<string, array{class: class-string, connection: ?string, ids: array<int|string, true>}> */
+        /** @var array<string, array{class: class-string, connection: ?string, ids: array<true>}> */
         $buckets = [];
 
         foreach ($subscribers as $subscriber) {
